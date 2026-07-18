@@ -48,7 +48,7 @@ function RepresentativeCard({ card, cycle }: { card: Card; cycle?: CardCycle }) 
           <CardCaption cycle={cycle} />
         </Button>
         <Tooltip
-          className="z-50 m-0 max-h-[min(440px,calc(100vh-24px))] w-[min(410px,calc(100vw-24px))] origin-(--trigger-anchor-point) overflow-auto rounded-[14px] border border-[#454b42] bg-[rgb(25_28_24_/_97%)] p-0 text-[#eceae3] shadow-[0_24px_70px_rgb(0_0_0_/_52%)] outline-none data-[entering]:animate-cycle-popover-in data-[exiting]:animate-cycle-popover-out"
+          className="z-50 m-0 max-h-[min(540px,calc(100vh-24px))] w-[min(760px,calc(100vw-24px))] origin-(--trigger-anchor-point) overflow-auto rounded-[14px] border border-[#454b42] bg-[rgb(25_28_24_/_97%)] p-0 text-[#eceae3] shadow-[0_24px_70px_rgb(0_0_0_/_52%)] outline-none data-[entering]:animate-cycle-popover-in data-[exiting]:animate-cycle-popover-out"
           offset={12}
           placement="bottom start"
         >
@@ -63,13 +63,10 @@ function RepresentativeCard({ card, cycle }: { card: Card; cycle?: CardCycle }) 
               </span>
             </div>
           </header>
-          <ul className="m-0 grid list-none grid-cols-2 gap-px p-2 max-[600px]:grid-cols-1">
+          <ul className="m-0 grid list-none grid-cols-5 gap-2.5 p-3 max-[700px]:grid-cols-4 max-[540px]:grid-cols-3 max-[400px]:grid-cols-2">
             {cycle.cards.map((cycleCard) => (
-              <li
-                className="flex min-h-10.5 min-w-0 items-center justify-between gap-2 rounded-lg bg-[#20231f] px-[9px] py-2 text-[0.72rem]"
-                key={cycleCard.oracleId}
-              >
-                <span className="truncate">{cycleCard.name}</span>
+              <li className="min-w-0" key={cycleCard.oracleId}>
+                <CardImage card={cycleCard} />
               </li>
             ))}
           </ul>
