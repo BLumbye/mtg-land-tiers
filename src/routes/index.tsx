@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Layers3, Sparkles } from "lucide-react";
 
 import { TierList } from "#/components/tier-list";
 
@@ -7,35 +6,16 @@ export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
   return (
-    <main className="site-shell">
-      <header className="site-header">
-        <a className="brand" href="/" aria-label="Land Index home">
-          <span className="brand__mark">
-            <Layers3 aria-hidden="true" size={18} strokeWidth={1.8} />
-          </span>
-          <span>Land Index</span>
-        </a>
-        <span className="example-badge">
-          <Sparkles aria-hidden="true" size={13} />
-          27 land cycles
-        </span>
-      </header>
-
-      <section className="hero">
-        <p className="eyebrow">A field guide to better mana</p>
-        <div className="hero__heading">
-          <h1>Land tier list</h1>
-          <p>
-            A clean, scannable ranking of the lands shaping the format. Hover a cycle card to see
-            every land it represents.
-          </p>
-        </div>
+    <main className="mx-auto w-[calc(100%_-_40px)] max-w-360 max-[600px]:w-[calc(100%_-_24px)]">
+      <section className="py-20">
+        <h1 className="text-[clamp(4rem,8.5vw,8.2rem)] leading-[0.82] font-serif">
+          Land tier list
+        </h1>
       </section>
 
       <TierList />
 
-      <footer className="site-footer">
-        <span>Land Index</span>
+      <footer className="flex items-center justify-between py-[44px] pb-[50px] text-[0.68rem] font-[650] tracking-[0.08em] text-[#62685e] uppercase max-[600px]:items-start max-[600px]:gap-5">
         <span>Card data and images via Scryfall</span>
       </footer>
     </main>

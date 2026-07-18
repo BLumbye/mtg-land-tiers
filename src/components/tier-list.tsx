@@ -6,28 +6,18 @@ import { landTiers, type Card, type CardCycle, type Tier } from "#/data/land-tie
 
 const tierDetails = {
   "5": {
-    title: "Format defining",
-    description: "The most powerful options available.",
     accent: "#f27c68",
   },
   "4": {
-    title: "Excellent",
-    description: "Reliable choices with a small opportunity cost.",
     accent: "#e9a94f",
   },
   "3": {
-    title: "Strong",
-    description: "Good options that reward the right supporting deck.",
     accent: "#d4c85c",
   },
   "2": {
-    title: "Situational",
-    description: "Useful in a narrower strategy or metagame.",
     accent: "#7eba74",
   },
   "1": {
-    title: "Fringe",
-    description: "Playable, but usually outclassed by another option.",
     accent: "#63a9a0",
   },
 } as const;
@@ -35,8 +25,11 @@ const tierDetails = {
 function RepresentativeCard({ card, cycle }: { card: Card; cycle?: CardCycle }) {
   if (!cycle) {
     return (
-      <div className="land-card-shell">
-        <article className="land-card" aria-label={card.name}>
+      <div className="w-42 flex-none max-[600px]:w-34">
+        <article
+          className="w-full transition-all hover:-translate-y-1 hover:brightness-105 focus-visible:-translate-y-1 focus-visible:rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--tier-accent) focus-visible:brightness-105"
+          aria-label={card.name}
+        >
           <CardImage card={card} />
           <CardCaption />
         </article>
@@ -45,30 +38,38 @@ function RepresentativeCard({ card, cycle }: { card: Card; cycle?: CardCycle }) 
   }
 
   return (
-    <div className="land-card-shell">
+    <div className="w-42 flex-none max-[600px]:w-34">
       <TooltipTrigger closeDelay={150} delay={150} shouldCloseOnPress={false}>
         <Button
           aria-label={`${card.name}, representative of ${cycle.name}`}
-          className="land-card land-card--button"
+          className="w-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-left transition-all hover:-translate-y-1 hover:brightness-105 focus-visible:-translate-y-1 focus-visible:rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--tier-accent) focus-visible:brightness-105"
         >
           <CardImage card={card} />
           <CardCaption cycle={cycle} />
         </Button>
-        <Tooltip className="cycle-popover" offset={12} placement="bottom start">
-          <header className="cycle-popover__header">
-            <span className="cycle-popover__icon">
+        <Tooltip
+          className="z-50 m-0 max-h-[min(440px,calc(100vh-24px))] w-[min(410px,calc(100vw-24px))] origin-(--trigger-anchor-point) overflow-auto rounded-[14px] border border-[#454b42] bg-[rgb(25_28_24_/_97%)] p-0 text-[#eceae3] shadow-[0_24px_70px_rgb(0_0_0_/_52%)] outline-none data-[entering]:animate-cycle-popover-in data-[exiting]:animate-cycle-popover-out"
+          offset={12}
+          placement="bottom start"
+        >
+          <header className="flex items-center gap-3 border-b border-[#393e36] p-4">
+            <span className="grid size-8 flex-none place-items-center rounded-full bg-[#30372d] text-[#bdcfac]">
               <Layers3 aria-hidden="true" size={15} />
             </span>
             <div>
-              <p>{cycle.name}</p>
-              <span>{cycle.cards.length} cards in this cycle</span>
+              <p className="m-0 font-serif text-base">{cycle.name}</p>
+              <span className="mt-[3px] block text-[0.68rem] text-[#838a7e]">
+                {cycle.cards.length} cards in this cycle
+              </span>
             </div>
           </header>
-          <ul className="cycle-popover__cards">
+          <ul className="m-0 grid list-none grid-cols-2 gap-px p-2 max-[600px]:grid-cols-1">
             {cycle.cards.map((cycleCard) => (
-              <li key={cycleCard.oracleId}>
-                <span>{cycleCard.name}</span>
-                {cycleCard.oracleId === card.oracleId ? <em>Representative</em> : null}
+              <li
+                className="flex min-h-10.5 min-w-0 items-center justify-between gap-2 rounded-lg bg-[#20231f] px-[9px] py-2 text-[0.72rem]"
+                key={cycleCard.oracleId}
+              >
+                <span className="truncate">{cycleCard.name}</span>
               </li>
             ))}
           </ul>
@@ -82,7 +83,7 @@ function CardImage({ card }: { card: Card }) {
   return (
     <img
       alt={card.name}
-      className="land-card__image"
+      className="block aspect-488/680 w-full rounded-[4.7%/3.4%] bg-[#252923] object-cover shadow-2xl"
       decoding="async"
       loading="lazy"
       src={card.imageUrl}
@@ -92,14 +93,16 @@ function CardImage({ card }: { card: Card }) {
 
 function CardCaption({ cycle }: { cycle?: CardCycle }) {
   return (
-    <span className="land-card__caption">
+    <span className="flex min-w-0 items-center justify-between gap-2 px-0.75 pt-2.5 text-[0.62rem] font-bold tracking-[0.08em] text-[#9ca397] uppercase">
       {cycle ? (
         <>
-          <span>{cycle.name}</span>
-          <small>{cycle.cards.length} cards</small>
+          <span className="truncate">{cycle.name}</span>
+          <small className="flex-none font-[inherit] text-[#656c61]">
+            {cycle.cards.length} cards
+          </small>
         </>
       ) : (
-        <span>Individual land</span>
+        <span className="truncate">Individual land</span>
       )}
     </span>
   );
@@ -119,22 +122,25 @@ function TierEntry({ entry }: { entry: Card | CardCycle }) {
   return <RepresentativeCard card={representative} cycle={entry} />;
 }
 
-function TierRow({ tier, index }: { tier: Tier; index: number }) {
+function TierRow({ tier }: { tier: Tier }) {
   const details = tierDetails[tier.name as keyof typeof tierDetails];
 
   return (
-    <li className="tier-row" style={{ "--tier-accent": details.accent } as CSSProperties}>
-      <div className="tier-rank" aria-label={`Tier ${tier.name}`}>
-        <span className="tier-rank__number">0{index + 1}</span>
-        <strong>{tier.name}</strong>
+    <li
+      className="grid min-h-60 grid-cols-[minmax(108px,0.18fr)_1fr] border-b border-border max-[900px]:grid-cols-[88px_minmax(0,1fr)] max-[600px]:grid-cols-[64px_minmax(0,1fr)]"
+      style={{ "--tier-accent": details.accent } as CSSProperties}
+    >
+      <div
+        className="relative flex h-full items-center justify-center overflow-hidden border-r border-border after:absolute after:right-0 after:left-0 after:bottom-0 after:h-1 after:bg-(--tier-accent)"
+        aria-label={`Tier ${tier.name}`}
+      >
+        <strong className="font-serif text-[clamp(4.8rem,9vw,8rem)] leading-1 text-(--tier-accent) max-[600px]:text-[3.8rem]">
+          {tier.name}
+        </strong>
       </div>
 
-      <div className="tier-content">
-        <div className="tier-copy">
-          <h2>{details.title}</h2>
-          <p>{details.description}</p>
-        </div>
-        <div className="tier-cards">
+      <div className="min-w-0 py-7 pl-8 max-[900px]:pl-6 max-[600px]:py-5.5 max-[600px]:pl-4.5">
+        <div className="flex min-w-0 gap-3 overflow-x-auto pt-2 pr-5 pb-3 scrollbar-thumb-[#464c42] scrollbar-track-transparent scrollbar-thin">
           {tier.cards.map((entry) => (
             <TierEntry entry={entry} key={entry.type === "card" ? entry.oracleId : entry.name} />
           ))}
@@ -146,9 +152,9 @@ function TierRow({ tier, index }: { tier: Tier; index: number }) {
 
 export function TierList() {
   return (
-    <ol className="tier-list" aria-label="Land rankings">
-      {landTiers.map((tier, index) => (
-        <TierRow key={tier.name} tier={tier} index={index} />
+    <ol className="border-t border-border" aria-label="Land rankings">
+      {landTiers.map((tier) => (
+        <TierRow key={tier.name} tier={tier} />
       ))}
     </ol>
   );
