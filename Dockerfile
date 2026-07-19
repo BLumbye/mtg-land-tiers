@@ -5,8 +5,10 @@
 FROM oven/bun:1.3.14-alpine AS installer
 WORKDIR /app
 
-COPY package.json bun.lock vite.config.ts ./
-RUN bun install --frozen-lockfile
+COPY package.json bun.lock ./
+# The project's prepare script runs `vp config`, which configures local Git
+# hooks and coding-agent integration. Neither is needed inside the image.
+RUN bun install --frozen-lockfile --ignore-scripts
 
 
 # Build the TanStack Start application. Nitro writes the production server to
