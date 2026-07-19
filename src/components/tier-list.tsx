@@ -1,5 +1,5 @@
-import { Layers3 } from "lucide-react";
-import { type CSSProperties } from "react";
+import { ChevronDown, ChevronUp, Layers3, Search, X } from "lucide-react";
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { Button, Tooltip, TooltipTrigger } from "react-aria-components";
 
 import { landTiers, type Card, type CardCycle, type Tier } from "#/data/land-tiers";
@@ -22,10 +22,30 @@ const tierDetails = {
   },
 } as const;
 
-function RepresentativeCard({ card, cycle }: { card: Card; cycle?: CardCycle }) {
+const noMatchingEntries = new Set<string>();
+
+type SearchState = "active" | "match" | undefined;
+
+function RepresentativeCard({
+  card,
+  cycle,
+  searchState,
+}: {
+  card: Card;
+  cycle?: CardCycle;
+  searchState?: SearchState;
+}) {
+  const wrapperClassName = `relative w-42 flex-none rounded-xl transition-[box-shadow] max-[600px]:w-34 ${
+    searchState === "active"
+      ? "ring-3 ring-[#f5e87d] ring-offset-5 ring-offset-[#11150f] shadow-[0_0_28px_rgb(245_232_125_/_28%)]"
+      : searchState === "match"
+        ? "ring-2 ring-[#c8bc68]/75 ring-offset-3 ring-offset-[#11150f]"
+        : ""
+  }`;
+
   if (!cycle) {
     return (
-      <div className="w-42 flex-none max-[600px]:w-34">
+      <div className={wrapperClassName} data-active-search-match={searchState === "active"}>
         <article
           className="w-full transition-all hover:-translate-y-1 hover:brightness-105 focus-visible:-translate-y-1 focus-visible:rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--tier-accent) focus-visible:brightness-105"
           aria-label={card.name}
@@ -38,7 +58,7 @@ function RepresentativeCard({ card, cycle }: { card: Card; cycle?: CardCycle }) 
   }
 
   return (
-    <div className="w-42 flex-none max-[600px]:w-34">
+    <div className={wrapperClassName} data-active-search-match={searchState === "active"}>
       <TooltipTrigger closeDelay={150} delay={150} shouldCloseOnPress={false}>
         <Button
           aria-label={`${card.name}, representative of ${cycle.name}`}
@@ -105,9 +125,13 @@ function CardCaption({ cycle }: { cycle?: CardCycle }) {
   );
 }
 
-function TierEntry({ entry }: { entry: Card | CardCycle }) {
+function entryKey(entry: Card | CardCycle) {
+  return entry.type === "card" ? entry.oracleId : entry.name;
+}
+
+function TierEntry({ entry, searchState }: { entry: Card | CardCycle; searchState?: SearchState }) {
   if (entry.type === "card") {
-    return <RepresentativeCard card={entry} />;
+    return <RepresentativeCard card={entry} searchState={searchState} />;
   }
 
   const representative = entry.cards.find((card) => card.name === entry.representative);
@@ -116,10 +140,18 @@ function TierEntry({ entry }: { entry: Card | CardCycle }) {
     return null;
   }
 
-  return <RepresentativeCard card={representative} cycle={entry} />;
+  return <RepresentativeCard card={representative} cycle={entry} searchState={searchState} />;
 }
 
-function TierRow({ tier }: { tier: Tier }) {
+function TierRow({
+  activeMatch,
+  matchingEntries,
+  tier,
+}: {
+  activeMatch?: string;
+  matchingEntries: Set<string>;
+  tier: Tier;
+}) {
   const details = tierDetails[tier.name as keyof typeof tierDetails];
 
   return (
@@ -139,7 +171,17 @@ function TierRow({ tier }: { tier: Tier }) {
       <div className="min-w-0 py-7 pl-8 max-[900px]:pl-6 max-[600px]:py-5.5 max-[600px]:pl-4.5">
         <div className="flex min-w-0 gap-3 overflow-x-auto pt-2 pr-5 pb-3 scrollbar-thumb-[#464c42] scrollbar-track-transparent scrollbar-thin">
           {tier.cards.map((entry) => (
-            <TierEntry entry={entry} key={entry.type === "card" ? entry.oracleId : entry.name} />
+            <TierEntry
+              entry={entry}
+              key={entryKey(entry)}
+              searchState={
+                activeMatch === entryKey(entry)
+                  ? "active"
+                  : matchingEntries.has(entryKey(entry))
+                    ? "match"
+                    : undefined
+              }
+            />
           ))}
         </div>
       </div>
@@ -148,11 +190,159 @@ function TierRow({ tier }: { tier: Tier }) {
 }
 
 export function TierList() {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [selectedMatch, setSelectedMatch] = useState(0);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const matchingEntryKeys = useMemo(() => {
+    if (!normalizedQuery) return [];
+
+    return landTiers.flatMap((tier) =>
+      tier.cards
+        .filter((entry) => {
+          const cards = entry.type === "card" ? [entry] : entry.cards;
+          return cards.some((card) => card.name.toLocaleLowerCase().includes(normalizedQuery));
+        })
+        .map(entryKey),
+    );
+  }, [normalizedQuery]);
+  const activeMatch = matchingEntryKeys[selectedMatch];
+  const matchingEntries = useMemo(() => new Set(matchingEntryKeys), [matchingEntryKeys]);
+
+  const openSearch = () => {
+    setIsSearchOpen(true);
+    requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+      searchInputRef.current?.select();
+    });
+  };
+
+  const moveMatch = (direction: 1 | -1) => {
+    if (matchingEntryKeys.length === 0) return;
+    setSelectedMatch(
+      (current) => (current + direction + matchingEntryKeys.length) % matchingEntryKeys.length,
+    );
+  };
+
+  useEffect(() => {
+    const handleFindShortcut = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLocaleLowerCase() === "f") {
+        event.preventDefault();
+        openSearch();
+      } else if (event.key === "Escape" && isSearchOpen) {
+        event.preventDefault();
+        setIsSearchOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleFindShortcut);
+    return () => window.removeEventListener("keydown", handleFindShortcut);
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    if (!activeMatch || !isSearchOpen) return;
+
+    document.querySelector<HTMLElement>('[data-active-search-match="true"]')?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "center",
+    });
+  }, [activeMatch, isSearchOpen]);
+
   return (
-    <ol className="border-t border-border" aria-label="Land rankings">
-      {landTiers.map((tier) => (
-        <TierRow key={tier.name} tier={tier} />
-      ))}
-    </ol>
+    <>
+      <div className="flex justify-end pb-4">
+        <Button
+          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#424a3e] bg-transparent px-4 py-2 text-xs font-bold text-[#aeb9a5] transition hover:border-[#75826d] hover:bg-[#1d221b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#9baa8f]"
+          onPress={openSearch}
+        >
+          <Search aria-hidden="true" size={14} />
+          Search cards
+          <kbd className="ml-1 rounded border border-[#3c4338] bg-[#191d17] px-1.5 py-0.5 font-sans text-[0.6rem] text-[#737b6e]">
+            Ctrl F
+          </kbd>
+        </Button>
+      </div>
+
+      {isSearchOpen ? (
+        <form
+          className="fixed top-4 right-4 z-60 flex items-center gap-1 rounded-xl border border-[#4b5248] bg-[rgb(24_28_23_/_98%)] p-1.5 shadow-[0_18px_55px_rgb(0_0_0_/_45%)] max-[520px]:right-3 max-[520px]:left-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            moveMatch(1);
+          }}
+          role="search"
+        >
+          <Search aria-hidden="true" className="ml-2 flex-none text-[#818b7a]" size={15} />
+          <label className="sr-only" htmlFor="card-search">
+            Search card names
+          </label>
+          <input
+            autoComplete="off"
+            className="min-w-0 flex-1 bg-transparent px-1.5 py-2 text-sm text-[#eceae3] outline-none placeholder:text-[#666e62] sm:w-56"
+            id="card-search"
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setSelectedMatch(0);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && event.shiftKey) {
+                event.preventDefault();
+                moveMatch(-1);
+              }
+            }}
+            placeholder="Card name…"
+            ref={searchInputRef}
+            value={query}
+          />
+          <output
+            aria-live="polite"
+            className="w-10 flex-none text-center text-[0.68rem] tabular-nums text-[#858d80]"
+          >
+            {matchingEntryKeys.length === 0
+              ? "0/0"
+              : `${selectedMatch + 1}/${matchingEntryKeys.length}`}
+          </output>
+          <Button
+            aria-label="Previous match"
+            className="grid size-8 cursor-pointer place-items-center rounded-lg text-[#929b8b] hover:bg-[#343a31] hover:text-white disabled:cursor-default disabled:opacity-35"
+            isDisabled={matchingEntryKeys.length === 0}
+            onPress={() => moveMatch(-1)}
+            type="button"
+          >
+            <ChevronUp aria-hidden="true" size={16} />
+          </Button>
+          <Button
+            aria-label="Next match"
+            className="grid size-8 cursor-pointer place-items-center rounded-lg text-[#929b8b] hover:bg-[#343a31] hover:text-white disabled:cursor-default disabled:opacity-35"
+            isDisabled={matchingEntryKeys.length === 0}
+            onPress={() => moveMatch(1)}
+            type="button"
+          >
+            <ChevronDown aria-hidden="true" size={16} />
+          </Button>
+          <Button
+            aria-label="Close search"
+            className="grid size-8 cursor-pointer place-items-center rounded-lg text-[#929b8b] hover:bg-[#343a31] hover:text-white"
+            onPress={() => setIsSearchOpen(false)}
+            type="button"
+          >
+            <X aria-hidden="true" size={16} />
+          </Button>
+        </form>
+      ) : null}
+
+      <ol className="border-t border-border" aria-label="Land rankings">
+        {landTiers.map((tier) => (
+          <TierRow
+            activeMatch={isSearchOpen ? activeMatch : undefined}
+            key={tier.name}
+            matchingEntries={isSearchOpen ? matchingEntries : noMatchingEntries}
+            tier={tier}
+          />
+        ))}
+      </ol>
+    </>
   );
 }
