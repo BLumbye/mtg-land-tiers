@@ -45,8 +45,14 @@ export const imageUrls = {
     "https://cards.scryfall.io/normal/front/2/f/2fa09104-acbe-4410-b101-2fe6ac28efde.jpg?1783905915",
   "City of Brass":
     "https://cards.scryfall.io/normal/front/c/2/c21565d0-fc40-4d89-9b27-87c03385e0af.jpg?1783904153",
+  "Mana Confluence":
+    "https://cards.scryfall.io/normal/front/5/0/504a69eb-3c2d-4bb1-b117-252b15acf0c2.jpg?1783939402",
   "Yavimaya, Cradle of Growth":
     "https://cards.scryfall.io/normal/front/4/e/4e4b6e22-93b2-4896-bba5-0ceaa5d8ea3c.jpg?1783926791",
+  "Urborg, Tomb of Yawgmoth":
+    "https://cards.scryfall.io/normal/front/9/e/9e1a9e38-6ffc-490f-b0be-23ba4e8204c6.jpg?1783927747",
+  "Academy Ruins":
+    "https://cards.scryfall.io/normal/front/a/9/a95b7645-154f-4904-bf71-db7eb24d4df2.jpg?1783930087",
   "Hall of Heliod's Generosity":
     "https://cards.scryfall.io/normal/front/f/0/f08dfd99-59fa-4a6c-bd69-c647f639de4d.jpg?1783909573",
   "Otawara, Soaring City":
@@ -355,12 +361,22 @@ export const imageUrls = {
     "https://cards.scryfall.io/normal/front/c/3/c36820fa-ee86-4206-9a0d-737a67cf5208.jpg?1783933065",
   "Waterlogged Grove":
     "https://cards.scryfall.io/normal/front/0/a/0ab6bfbd-d2e1-4c4c-9f91-6f69c5b8e3bb.jpg?1783933063",
+  "Choked Estuary":
+    "https://cards.scryfall.io/normal/front/0/c/0c37e84e-e7e0-4dfe-bf17-daeb2e434861.jpg?1783903208",
+  "Foreboding Ruins":
+    "https://cards.scryfall.io/normal/front/7/6/76fdf6be-e13b-49ee-9d50-8625edb49951.jpg?1783903200",
+  "Fortified Village":
+    "https://cards.scryfall.io/normal/front/1/5/15f81ac6-a550-4782-a3a9-22d7fef1c206.jpg?1783903201",
   "Frostboil Snarl":
     "https://cards.scryfall.io/normal/front/a/e/ae705a26-5371-4236-904c-fe3e58b4721d.jpg?1783903201",
   "Furycalm Snarl":
     "https://cards.scryfall.io/normal/front/a/f/afc12892-4978-4442-ace5-c4dea5c0ee00.jpg?1783903200",
+  "Game Trail":
+    "https://cards.scryfall.io/normal/front/2/a/2a84a604-7b05-4716-bcd8-40d2acdb76e8.jpg?1783912962",
   "Necroblossom Snarl":
     "https://cards.scryfall.io/normal/front/4/3/4355ba23-de6a-4f18-baf4-82ae47cc2965.jpg?1783903729",
+  "Port Town":
+    "https://cards.scryfall.io/normal/front/3/f/3f962cab-c058-41f5-b7e1-5b063f374eb0.jpg?1783903197",
   "Shineshadow Snarl":
     "https://cards.scryfall.io/normal/front/7/a/7a198106-4d31-4e10-884a-bdf2316f8088.jpg?1783903721",
   "Vineglimmer Snarl":

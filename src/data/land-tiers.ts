@@ -68,9 +68,15 @@ export const landTiers = [
       card("Talon Gates of Madara"),
       card("Uthros, Titanic Godcore"),
       card("Evendo, Waking Haven"),
-      card("City of Brass"),
-      card("Yavimaya, Cradle of Growth"),
-      card("Hall of Heliod's Generosity"),
+      cycle("Rainbow pain lands", "City of Brass", ["City of Brass", "Mana Confluence"]),
+      cycle("Yavimaya and Urborg", "Yavimaya, Cradle of Growth", [
+        "Yavimaya, Cradle of Growth",
+        "Urborg, Tomb of Yawgmoth",
+      ]),
+      cycle("Graveyard recursion lands", "Hall of Heliod's Generosity", [
+        "Academy Ruins",
+        "Hall of Heliod's Generosity",
+      ]),
       card("Otawara, Soaring City"),
       card("Boseiju, Who Endures"),
       cycle("Triomes", "Raffine's Tower", [
@@ -262,10 +268,15 @@ export const landTiers = [
         "Sunbaked Canyon",
         "Waterlogged Grove",
       ]),
-      cycle("Snarl lands", "Necroblossom Snarl", [
+      cycle("Reveal lands", "Necroblossom Snarl", [
+        "Choked Estuary",
+        "Foreboding Ruins",
+        "Fortified Village",
         "Frostboil Snarl",
         "Furycalm Snarl",
+        "Game Trail",
         "Necroblossom Snarl",
+        "Port Town",
         "Shineshadow Snarl",
         "Vineglimmer Snarl",
       ]),
