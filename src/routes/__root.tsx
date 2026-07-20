@@ -33,6 +33,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html className="min-h-full bg-[#111410] font-sans" lang="en">
       <head>
         <HeadContent />
+        <script src="/random-favicon.js" />
       </head>
       <body className="m-0 min-h-full min-w-80 bg-[radial-gradient(circle_at_74%_0%,rgb(95_119_73_/_16%),transparent_31rem)] text-[#f2f0e9] [font-synthesis:none]">
         {children}
