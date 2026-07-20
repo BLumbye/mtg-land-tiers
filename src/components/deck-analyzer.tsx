@@ -3,15 +3,7 @@ import { useMemo, useState } from "react";
 
 import { landTiers, type Card } from "#/data/land-tiers";
 import { parseDeckList, type DeckEntry } from "#/lib/deck-list";
-
-type ScryfallCard = {
-  name: string;
-  type_line: string;
-};
-
-type ClassifiedLand = DeckEntry & {
-  isBasic: boolean;
-};
+import { classifyLands, type ClassifiedLand, type ScryfallCard } from "#/lib/scryfall-cards";
 
 type Analysis = {
   lands: ClassifiedLand[];
@@ -56,23 +48,8 @@ async function fetchCards(entries: DeckEntry[]): Promise<Analysis> {
     }
   }
 
-  const entryByName = new Map(entries.map((entry) => [entry.name.toLocaleLowerCase(), entry]));
-  const lands: ClassifiedLand[] = [];
-
-  for (const card of cards) {
-    if (!card.type_line.split(" // ").some((typeLine) => typeLine.includes("Land"))) continue;
-    const entry = entryByName.get(card.name.toLocaleLowerCase());
-    if (entry) {
-      lands.push({
-        ...entry,
-        isBasic: card.type_line.split(" // ").some((typeLine) => typeLine.includes("Basic Land")),
-        name: card.name,
-      });
-    }
-  }
-
   return {
-    lands,
+    lands: classifyLands(entries, cards),
     unresolved: entries.filter((entry) => missingNames.has(entry.name.toLocaleLowerCase())),
   };
 }
